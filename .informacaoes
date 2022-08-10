@@ -1,0 +1,11 @@
+## instalar o eslint ##
+ npm i eslint -D 
+
+OBS: e a configuração da rocketseat
+npm i @rocketseat/eslint-config -D 
+
+comando para lintar
+npx eslint src --ext .ts --ext .tsx
+
+## Testar o eslint ##
+npx eslint src --ext .ts,.tsx 
