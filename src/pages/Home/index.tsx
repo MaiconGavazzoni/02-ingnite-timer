@@ -14,6 +14,7 @@ import {
 import { NewCycleForm } from './components/NewCycleForm'
 import { Countdown } from './components/Countdown'
 import { CyclesContext } from '../../contexts/CyclesContext'
+import { AuthContext } from '../../contexts/AuthContext'
 
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'Informe a tarefa'),
@@ -28,6 +29,11 @@ type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
 export function Home() {
   const { activeCycle, createNewCycle, interruptCurrentCycle } =
     useContext(CyclesContext)
+
+  // parte de autenticação meus testes
+  const { user } = useContext(AuthContext)
+
+  console.log('Home', user)
 
   const newCycleForm = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),

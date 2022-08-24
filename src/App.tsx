@@ -4,14 +4,20 @@ import { BrowserRouter } from 'react-router-dom'
 import { GlobalStyle } from './styles/global'
 import { defaultTheme } from './styles/themes/default'
 import { CyclesContextProvider } from './contexts/CyclesContext'
+import { AuthProvider } from './contexts/AuthContext'
+import { CookiesProvider } from 'react-cookie'
 
 export function App() {
   return (
     <ThemeProvider theme={defaultTheme}>
       <BrowserRouter>
-        <CyclesContextProvider>
-          <Router />
-        </CyclesContextProvider>
+        <CookiesProvider>
+          <AuthProvider>
+            <CyclesContextProvider>
+              <Router />
+            </CyclesContextProvider>
+          </AuthProvider>
+        </CookiesProvider>
       </BrowserRouter>
       <GlobalStyle />
     </ThemeProvider>
