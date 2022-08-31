@@ -54,7 +54,7 @@ export function CyclesContextProvider({
       }
 
       const data = {
-        cycles: [{} as Cycle],
+        cycles: [],
         activeCycleId: null,
       }
 
