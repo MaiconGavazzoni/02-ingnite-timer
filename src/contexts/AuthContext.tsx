@@ -1,16 +1,13 @@
 import { createContext, ReactNode, useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie'
-import { useNavigate, browserHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { api, cookie } from '../services/api'
 
 type User = {
+  username: string
   email: string
   permissions: string[]
   roles: string[]
-  client: {
-    username: string
-  }
-  token: string
 }
 
 type AuthProviderProps = {
@@ -40,7 +37,7 @@ export const AuthContext = createContext({} as AuthContextData)
 export function signOut() {
   cookie.remove('igniteTimer.token')
   cookie.remove('igniteTimer.refresh_token')
-  browserHistory.push('/')
+  // browserHistory.push('/')
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -50,30 +47,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
     'igniteTimer.token',
     'igniteTimer.refresh_token',
   ])
-  const isAuthenticated = !!user
-  console.log(user)
+  const isAuthenticated = !!user.email
 
   useEffect(() => {
     const token = cookies['igniteTimer.token']
-    console.log('Token', token)
     if (token) {
       api
-        .post('/client/authenticate/me')
+        .post('/users/me')
         .then((response) => {
-          const { client, token } = response.data
+          const { user } = response.data as User
           setUser({
-            email: client.username,
-            permissions: [],
-            roles: [],
-            client: {
-              username: client.username,
-            },
-            token,
+            username: user.username,
+            email: user.username,
+            permissions: user.permissions,
+            roles: user.roles,
           })
+
+          if (user.email) {
+            navigate('/home')
+          }
         })
+
         .catch(() => {
           signOut()
-          // navigate('/')
+          navigate('/')
         })
     }
   }, [])
@@ -84,18 +81,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       password,
     }
     try {
-      const response = await api.post('/client/authenticate/', data)
+      const response = await api.post('/sessions/', data)
 
-      const { client, token } = response.data
+      // eslint-disable-next-line camelcase
+      const { user, token, refresh_token } = response.data
 
       setUser({
-        email: client.username,
-        permissions: [],
-        roles: [],
-        client: {
-          username: client.username,
-        },
-        token,
+        username: user.username,
+        email: user.email,
+        permissions: user.permissions,
+        roles: user.roles,
       })
 
       setCookie('igniteTimer.token', token, {
@@ -103,7 +98,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         path: '/',
       })
 
-      setCookie('igniteTimer.refresh_token', token, {
+      setCookie('igniteTimer.refresh_token', refresh_token, {
         maxAge: 60 * 60 * 24 * 30, // 30dias
         path: '/',
       })

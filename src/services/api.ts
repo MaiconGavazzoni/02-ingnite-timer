@@ -11,10 +11,8 @@ let isRefreshing = false
 // eslint-disable-next-line prefer-const
 let failedRequestsQueue: any = []
 
-console.log('Api axios', token)
-
 export const api = axios.create({
-  baseURL: 'https://delivey.herokuapp.com',
+  baseURL: 'https://projeto-base-authorization.herokuapp.com',
   headers: {
     Authorization: `Bearer ${token}`,
   },
@@ -28,16 +26,19 @@ api.interceptors.response.use(
     console.log(error.response?.status)
     if (error.response?.status === 401) {
       if (error.response.data?.code === 'token.expired') {
-        const refresh_token = cookie.get('igniteTimer.refresh_token')
+        // eslint-disable-next-line camelcase
+        const refresh = cookie.get('igniteTimer.refresh_token')
+
         const originalConfig = error.config
 
         if (!isRefreshing) {
           isRefreshing = true
           api
-            .post('/refresh', { refresh_token })
+            // eslint-disable-next-line camelcase
+            .post('/refresh-token', { refresh })
             .then((response) => {
               const { token } = response.data
-
+              console.log('Novo Token ', token)
               cookie.set('igniteTimer.token', token, {
                 maxAge: 60 * 60 * 24 * 30, // 30 dias
                 path: '/',
@@ -75,7 +76,7 @@ api.interceptors.response.use(
           failedRequestsQueue.push({
             onSuccess: (token: string) => {
               // eslint-disable-next-line dot-notation
-              originalConfig.headers.common['Authorization'] = `Bearer ${token}`
+              originalConfig.headers['Authorization'] = `Bearer ${token}`
               resolve(api(originalConfig))
             },
             onFailure: (err: AxiosError) => {

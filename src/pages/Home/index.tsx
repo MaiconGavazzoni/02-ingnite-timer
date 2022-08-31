@@ -33,8 +33,6 @@ export function Home() {
   // parte de autenticação meus testes
   const { user } = useContext(AuthContext)
 
-  console.log('Home', user)
-
   const newCycleForm = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
     defaultValues: {
