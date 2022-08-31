@@ -13,3 +13,21 @@ npx eslint src --ext .ts,.tsx
 
 ver no porque não funcona no meu crome
  &::-webkit-calendar-picker-inicator
+
+ ## Deploy na vercel ##
+ OBS: na pasta do projeto
+ vercel login 
+
+ vercel 
+ y
+ enter
+ n
+ enter 
+ enter 
+
+ ## buildar novamente ##
+ vercel
+
+ ## elevar para produção ##
+ vercel --prod
+

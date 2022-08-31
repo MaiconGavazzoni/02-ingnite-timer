@@ -1,6 +1,10 @@
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { Cookies } from 'react-cookie'
 import { signOut } from '../contexts/AuthContext'
+
+interface ResponseProps extends AxiosError {
+  code: string
+}
 
 export const cookie = new Cookies()
 
@@ -25,11 +29,12 @@ api.interceptors.response.use(
   (error: AxiosError) => {
     console.log(error.response?.status)
     if (error.response?.status === 401) {
-      if (error.response.data?.code === 'token.expired') {
+      const code = error.response.data as ResponseProps
+      if (code.code === 'token.expired') {
         // eslint-disable-next-line camelcase
         const refresh = cookie.get('igniteTimer.refresh_token')
 
-        const originalConfig = error.config
+        const originalConfig = error.config as AxiosRequestConfig<any>
 
         if (!isRefreshing) {
           isRefreshing = true
@@ -56,13 +61,13 @@ api.interceptors.response.use(
               // eslint-disable-next-line dot-notation
               api.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
-              failedRequestsQueue.forEach((request) => {
+              failedRequestsQueue.forEach((request: any) => {
                 request.onSuccess(token)
               })
               failedRequestsQueue = []
             })
             .catch((err) => {
-              failedRequestsQueue.forEach((request) => {
+              failedRequestsQueue.forEach((request: any) => {
                 request.onFailure(err)
               })
               failedRequestsQueue = []
@@ -71,12 +76,14 @@ api.interceptors.response.use(
               isRefreshing = false
             })
         }
-
         return new Promise((resolve, reject) => {
           failedRequestsQueue.push({
             onSuccess: (token: string) => {
               // eslint-disable-next-line dot-notation
-              originalConfig.headers['Authorization'] = `Bearer ${token}`
+              if (originalConfig.headers !== undefined) {
+                // eslint-disable-next-line dot-notation
+                originalConfig.headers['Authorization'] = `Bearer ${token}`
+              }
               resolve(api(originalConfig))
             },
             onFailure: (err: AxiosError) => {

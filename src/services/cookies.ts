@@ -16,7 +16,7 @@ class Cookies {
       }
   }
 
-  setCookies(opts) {
+  setCookies(opts: any) {
     this._cookies = new ReactCookies(Object.assign({}, opts))
   }
 

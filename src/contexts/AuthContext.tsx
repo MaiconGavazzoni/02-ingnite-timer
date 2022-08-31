@@ -55,7 +55,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       api
         .post('/users/me')
         .then((response) => {
-          const { user } = response.data as User
+          const { user } = response.data as any
           setUser({
             username: user.username,
             email: user.username,
