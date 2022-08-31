@@ -26,7 +26,7 @@ type SingInCredential = {
 
 type AuthContextData = {
   signIn: (credentials: SingInCredential) => Promise<void>
-  // signOut: () => void
+  signOut: () => void
   user: User
   isAuthenticated: boolean
   cookies: any
@@ -111,8 +111,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  function signOut() {
+    cookie.remove('igniteTimer.token')
+    cookie.remove('igniteTimer.refresh_token')
+    // browserHistory.push('/')
+    setUser({} as User)
+    navigate('/')
+  }
+
   return (
-    <AuthContext.Provider value={{ signIn, isAuthenticated, user, cookies }}>
+    <AuthContext.Provider
+      value={{ signIn, isAuthenticated, user, cookies, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   )
